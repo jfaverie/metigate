@@ -42,11 +42,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class FileUploadSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='id'
-    )
-
+    owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = FileUpload
         read_only_fields = ('created', 'datafile', 'owner')

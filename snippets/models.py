@@ -41,5 +41,5 @@ def save(self, *args, **kwargs):
 
 class FileUpload(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey(User, to_field='id')
+    owner = models.ForeignKey('auth.User', related_name='file')
     datafile = models.FileField()
