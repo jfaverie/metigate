@@ -38,8 +38,5 @@ def save(self, *args, **kwargs):
     self.highlighted = highlight(self.code, lexer, formatter)
     super(Snippet, self).save(*args, **kwargs)
 
-
-class FileUpload(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey('auth.User', related_name='file')
-    datafile = models.FileField()
+class Document(models.Model):
+    docfile = models.FileField(upload_to='documents/%Y/%m/%d')

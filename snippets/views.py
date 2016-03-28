@@ -4,9 +4,15 @@ from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.viewsets import ModelViewSet
-from snippets.models import Snippet, FileUpload
+from snippets.models import Snippet, Document
 from snippets.permissions import IsOwnerOrReadOnly
-from snippets.serializers import SnippetSerializer, UserSerializer, FileUploadSerializer
+from snippets.forms import DocumentForm
+from snippets.serializers import SnippetSerializer, UserSerializer
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+
 
 
 class SnippetViewSet(viewsets.ModelViewSet):
@@ -34,13 +40,25 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
 
 
-class FileUploadViewSet(ModelViewSet):
-    
-    queryset = FileUpload.objects.all()
-    serializer_class = FileUploadSerializer
-    parser_classes = (MultiPartParser, FormParser,)
+def list(request):
+    # Handle file upload
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            newdoc = Document(docfile = request.FILES['docfile'])
+            newdoc.save()
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user,
-                       datafile=self.request.data.get('datafile'))
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('snippets.views.list'))
+    else:
+        form = DocumentForm() # A empty, unbound form
 
+    # Load documents for the list page
+    documents = Document.objects.all()
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'snippets/list.html',
+        {'documents': documents, 'form': form},
+        context_instance=RequestContext(request)
+    )

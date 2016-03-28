@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 from django.contrib.auth.models import User
-from snippets.models import FileUpload
+
 
 
 class SnippetSerializer(serializers.ModelSerializer):
@@ -40,9 +40,3 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'snippets')
 
-
-class FileUploadSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
-    class Meta:
-        model = FileUpload
-        read_only_fields = ('created', 'datafile', 'owner')
